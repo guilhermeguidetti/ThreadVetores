@@ -1,37 +1,57 @@
 import java.util.Arrays;
 
 public class ParallelMergeSort {
+    private static final ProcessorManager processorManager = new ProcessorManager(
+            Runtime.getRuntime().availableProcessors());
+
     public static void main(String[] args) {
-        int[] arr = Vector.populateVector(100); // Use a classe Vector para criar o vetor desordenado
-        System.out.println("Array desordenado:");
-        Arrays.toString(arr);
+        int[] arr = Vector.populateVector(30);
+        if (arr.length > 100) {
+            System.out.println("Array desordenado:");
+            System.out.println(Arrays.toString(arr));
+        }
 
-        parallelMergeSort(arr, Runtime.getRuntime().availableProcessors());
+        parallelMergeSort(arr);
 
-        System.out.println("\nArray ordenado:");
-        Arrays.toString(arr);
+        if (arr.length > 100) {
+            System.out.println("Array ordenado:");
+            System.out.println(Arrays.toString(arr));
+        }
     }
 
-    private static void parallelMergeSort(int[] arr, int processors) {
-        Thread currentThread = Thread.currentThread();
-        String threadInfo = "Thread " + currentThread.getId();
-        System.out.println(threadInfo + ": Iniciada para ordenar vetor de tamanho " + arr.length);
-
-        if (processors <= 1 || arr.length <= 1) {
-            mergeSort(arr);
-        } else {
+    private static void parallelMergeSort(int[] arr) {
+        if (processorManager.hasAvailableProcessor() && arr.length > 1) {
             int middle = arr.length / 2;
             int[] leftHalf = new int[middle];
             int[] rightHalf = new int[arr.length - middle];
 
-            System.arraycopy(arr, 0, leftHalf, 0, middle);
-            System.arraycopy(arr, middle, rightHalf, 0, arr.length - middle);
+            for (int i = 0; i < middle; i++) {
+                leftHalf[i] = arr[i];
+            }
+            for (int i = middle; i < arr.length; i++) {
+                rightHalf[i - middle] = arr[i];
+            }
 
-            Thread leftThread = new Thread(() -> parallelMergeSort(leftHalf, processors / 2));
-            Thread rightThread = new Thread(() -> parallelMergeSort(rightHalf, processors / 2));
+            Thread leftThread = new Thread(() -> {
+                processorManager.allocateProcessor();
+                parallelMergeSort(leftHalf);
+                processorManager.releaseProcessor();
+            });
+            Thread rightThread = new Thread(() -> {
+                processorManager.allocateProcessor();
+                parallelMergeSort(rightHalf);
+                processorManager.releaseProcessor();
+            });
 
             leftThread.start();
             rightThread.start();
+
+            System.out.println(
+                    "Thread " + Thread.currentThread().getId() + " ordenando vetor [ESQ] de tamanho "
+                            + leftHalf.length);
+            System.out.println(
+                    "Thread " + Thread.currentThread().getId() + " ordenando vetor [DIR] de tamanho "
+                            + rightHalf.length);
 
             try {
                 leftThread.join();
@@ -41,10 +61,11 @@ public class ParallelMergeSort {
             }
 
             System.out.println(
-                    threadInfo + ": Mesclando vetores os vetores " + Arrays.toString(leftHalf) + " e "
-                            + Arrays.toString(rightHalf));
-
+                    "Thread " + Thread.currentThread().getId() + " Mesclando vetores " + Arrays.toString(leftHalf)
+                            + " e " + Arrays.toString(rightHalf));
             merge(arr, leftHalf, rightHalf);
+        } else {
+            mergeSort(arr);
         }
     }
 
@@ -73,20 +94,17 @@ public class ParallelMergeSort {
             int[] left = new int[middle];
             int[] right = new int[arr.length - middle];
 
-            System.arraycopy(arr, 0, left, 0, middle);
-            System.arraycopy(arr, middle, right, 0, arr.length - middle);
+            for (int i = 0; i < middle; i++) {
+                left[i] = arr[i];
+            }
+            for (int i = middle; i < arr.length; i++) {
+                right[i - middle] = arr[i];
+            }
 
             mergeSort(left);
             mergeSort(right);
 
             merge(arr, left, right);
         }
-    }
-
-    private static void printArray(int[] arr) {
-        for (int value : arr) {
-            System.out.print(value + " ");
-        }
-        System.out.println();
     }
 }
