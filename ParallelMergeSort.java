@@ -5,16 +5,16 @@ public class ParallelMergeSort {
             Runtime.getRuntime().availableProcessors());
 
     public static void main(String[] args) {
-        int[] arr = Vector.populateVector(30);
-        if (arr.length > 100) {
-            System.out.println("Array desordenado:");
+        int[] arr = Vector.populateVector(60);
+        if (arr.length < 100) {
+            System.out.println("Vetor desordenado:");
             System.out.println(Arrays.toString(arr));
         }
 
         parallelMergeSort(arr);
 
-        if (arr.length > 100) {
-            System.out.println("Array ordenado:");
+        if (arr.length < 100) {
+            System.out.println("Vetor ordenado:");
             System.out.println(Arrays.toString(arr));
         }
     }
@@ -47,10 +47,10 @@ public class ParallelMergeSort {
             rightThread.start();
 
             System.out.println(
-                    "Thread " + Thread.currentThread().getId() + " ordenando vetor [ESQ] de tamanho "
+                    "Thread " + Thread.currentThread().getId() + ": ordenando vetor [ESQ] de tamanho "
                             + leftHalf.length);
             System.out.println(
-                    "Thread " + Thread.currentThread().getId() + " ordenando vetor [DIR] de tamanho "
+                    "Thread " + Thread.currentThread().getId() + ": ordenando vetor [DIR] de tamanho "
                             + rightHalf.length);
 
             try {
@@ -59,10 +59,14 @@ public class ParallelMergeSort {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+            if (arr.length < 100) {
+                System.out.println(
+                        "Mesclando vetores " + Arrays.toString(leftHalf) + " e " + Arrays.toString(rightHalf));
+            } else {
+                System.out.println(
+                        "Mesclando vetores de tamanho " + leftHalf.length + " e " + rightHalf.length);
+            }
 
-            System.out.println(
-                    "Thread " + Thread.currentThread().getId() + " Mesclando vetores " + Arrays.toString(leftHalf)
-                            + " e " + Arrays.toString(rightHalf));
             merge(arr, leftHalf, rightHalf);
         } else {
             mergeSort(arr);
@@ -102,7 +106,13 @@ public class ParallelMergeSort {
             }
 
             mergeSort(left);
+            System.out.println(
+                    "Recursividade: " + "ordenando vetor [ESQ] de tamanho "
+                            + left.length);
             mergeSort(right);
+            System.out.println(
+                    "Recursividade: " + "ordenando vetor [DIR] de tamanho "
+                            + right.length);
 
             merge(arr, left, right);
         }
