@@ -1,13 +1,15 @@
+import java.util.Arrays;
+
 public class ParallelMergeSort {
     public static void main(String[] args) {
         int[] arr = Vector.populateVector(100); // Use a classe Vector para criar o vetor desordenado
         System.out.println("Array desordenado:");
-        printArray(arr);
+        Arrays.toString(arr);
 
         parallelMergeSort(arr, Runtime.getRuntime().availableProcessors());
 
         System.out.println("\nArray ordenado:");
-        printArray(arr);
+        Arrays.toString(arr);
     }
 
     private static void parallelMergeSort(int[] arr, int processors) {
@@ -39,12 +41,9 @@ public class ParallelMergeSort {
             }
 
             System.out.println(
-                    threadInfo + ": Mesclando vetores de tamanho " + leftHalf.length + " e " + rightHalf.length);
-            System.out.print(threadInfo + ": Vetor esquerdo: ");
-            printArray(leftHalf);
-            System.out.print(threadInfo + ": Vetor direito: ");
-            printArray(rightHalf);
-            System.out.println();
+                    threadInfo + ": Mesclando vetores os vetores " + Arrays.toString(leftHalf) + " e "
+                            + Arrays.toString(rightHalf));
+
             merge(arr, leftHalf, rightHalf);
         }
     }
