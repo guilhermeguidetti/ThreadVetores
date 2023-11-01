@@ -5,7 +5,7 @@ public class ParallelMergeSort {
             Runtime.getRuntime().availableProcessors());
 
     public static void main(String[] args) {
-        int[] arr = Vector.populateVector(1000000);
+        int[] arr = Vector.populateVector(100000000);
         if (arr.length < 100) {
             System.out.println("Vetor desordenado:");
             System.out.println(Arrays.toString(arr));
