@@ -1,5 +1,9 @@
 import java.util.Arrays;
-
+/* 
+Guilherme Zanoni Guidetti
+Gustavo Peres de Oliveira
+Henrique Vergili de Freitas Dias
+*/  
 public class ParallelMergeSort {
     private static final ProcessorManager processorManager = new ProcessorManager(
             Runtime.getRuntime().availableProcessors());
